@@ -32,7 +32,8 @@ public class MainTesting {
 		NearestNeighbours neighbourhood = new NNRarity(answersTable, thingsTable);
 		Recommend recommender = new RecRarity(answersTable, thingsTable);
 		//Recommend recommender = new RecCommonInterest(answersTable);
-		Printer print = new Printer("printing.csv", numRecs);
+		//Printer print = new CSV2ColPrinter("printing.csv", numRecs);
+		Printer print = new MiniPrinter();
 		
 		int pmxid = hillary;
 		//for (int pmxid : answersTable.userList){
@@ -47,12 +48,12 @@ public class MainTesting {
 			
 			/** Print recommendations */
 			
+			
 			print.printRecs(pmxid, recommendations);
-			//print.csvRecs(pmxid, recommendations);
 			
 		//}
 			
-			print.closecsvPrint();
+			print.closePrint();
 		
 		
 	}
