@@ -1,4 +1,4 @@
-package makeAnswersMatrix;
+package collabFiltering;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

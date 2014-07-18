@@ -1,4 +1,4 @@
-package makeAnswersMatrix;
+package collabFiltering;
 
 public class Pair<user, value>{
 	private int user;

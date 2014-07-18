@@ -1,4 +1,4 @@
-package makeAnswersMatrix;
+package collabFiltering;
 
 import java.util.List;
 import java.util.Set;
@@ -32,8 +32,8 @@ public class MainTesting {
 		NearestNeighbours neighbourhood = new NNRarity(answersTable, thingsTable);
 		Recommend recommender = new RecRarity(answersTable, thingsTable);
 		//Recommend recommender = new RecCommonInterest(answersTable);
-		//Printer print = new CSV2ColPrinter("printing.csv", numRecs);
-		Printer print = new MiniPrinter();
+		Printer print = new CSV2ColPrinter("printing.csv", numRecs);
+		//Printer print = new MiniPrinter();
 		
 		int pmxid = hillary;
 		//for (int pmxid : answersTable.userList){

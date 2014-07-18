@@ -1,4 +1,4 @@
-package makeAnswersMatrix;
+package collabFiltering;
 
 import java.util.ArrayList;
 import java.util.List;
