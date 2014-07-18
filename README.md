@@ -1,3 +1,2 @@
 YG-MSc-project
-Hillary
 ==============
