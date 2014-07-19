@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Hashtable;
 
+import collabFiltering.users.User;
+import collabFiltering.users.UserRatings;
+
 
 public class TableUsers {
 	

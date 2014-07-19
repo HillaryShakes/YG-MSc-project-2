@@ -1,4 +1,4 @@
-package collabFiltering;
+package collabFiltering.printers;
 
 import java.io.FileWriter;
 import java.io.IOException;

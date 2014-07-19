@@ -1,8 +1,13 @@
-package collabFiltering;
+package collabFiltering.neighbours;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import collabFiltering.Pair;
+import collabFiltering.TableUsers;
+import collabFiltering.Things;
+import collabFiltering.users.User;
 
 /** Choose neighbours based on how unusual their similarities to the users are.
  * For each potential neighbour for each rated item they have in common with the 

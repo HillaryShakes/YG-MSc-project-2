@@ -1,7 +1,13 @@
-package collabFiltering;
+package collabFiltering.recSystems;
 
 import java.util.List;
 import java.util.Set;
+
+import collabFiltering.Pair;
+import collabFiltering.TableUsers;
+import collabFiltering.neighbours.NearestNeighbours;
+import collabFiltering.printers.Printer;
+import collabFiltering.recommenders.Recommend;
 
 public class CFRecSystem implements RecSystem{
 	
@@ -9,20 +15,18 @@ public class CFRecSystem implements RecSystem{
 	private Recommend recommender;
 	private TableUsers answersTable;
 	private int numNeighbours;
-	private int numRecs;
 	private List<Pair> neighbours;
 	private Set<String> recommendations;
 	
-	public CFRecSystem(TableUsers answersTable, NearestNeighbours neighbourhood, Recommend recommender,  int numNeighbours, int numRecs){
+	public CFRecSystem(TableUsers answersTable, NearestNeighbours neighbourhood, Recommend recommender,  int numNeighbours){
 		this.neighbourhood = neighbourhood;
 		this.recommender = recommender;
 		this.answersTable = answersTable;
 		this.numNeighbours = numNeighbours;
-		this.numRecs = numRecs;
 	}
 
 	@Override
-	public void makeRecommendations(int pmxid) {
+	public void makeRecommendations(int pmxid, int numRecs) {
 		neighbours = neighbourhood.getNeighbours(numNeighbours, pmxid);
 		recommendations = recommender.getRecommendations(numRecs, neighbours, pmxid);
 		

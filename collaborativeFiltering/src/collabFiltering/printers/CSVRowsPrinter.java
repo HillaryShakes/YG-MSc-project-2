@@ -1,4 +1,4 @@
-package collabFiltering;
+package collabFiltering.printers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

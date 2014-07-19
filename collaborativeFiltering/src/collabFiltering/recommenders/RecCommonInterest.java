@@ -1,4 +1,4 @@
-package collabFiltering;
+package collabFiltering.recommenders;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,6 +6,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
+
+import collabFiltering.Pair;
+import collabFiltering.TableUsers;
+import collabFiltering.users.User;
 
 /**
  * basic common interest rec

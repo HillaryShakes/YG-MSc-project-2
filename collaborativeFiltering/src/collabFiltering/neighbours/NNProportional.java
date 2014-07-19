@@ -1,8 +1,12 @@
-package collabFiltering;
+package collabFiltering.neighbours;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import collabFiltering.Pair;
+import collabFiltering.TableUsers;
+import collabFiltering.users.User;
 
 
 /**

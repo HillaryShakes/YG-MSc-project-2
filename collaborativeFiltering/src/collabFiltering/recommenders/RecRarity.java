@@ -1,4 +1,4 @@
-package collabFiltering;
+package collabFiltering.recommenders;
 
 /**
  * Serendipitous rec
@@ -14,6 +14,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
+
+import collabFiltering.Pair;
+import collabFiltering.TableUsers;
+import collabFiltering.Things;
+import collabFiltering.users.User;
 
 public class RecRarity implements Recommend {
 	

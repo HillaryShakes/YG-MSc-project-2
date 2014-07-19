@@ -3,6 +3,15 @@ package collabFiltering;
 import java.util.List;
 import java.util.Set;
 
+import collabFiltering.neighbours.NNRarity;
+import collabFiltering.neighbours.NearestNeighbours;
+import collabFiltering.printers.MiniPrinter;
+import collabFiltering.printers.Printer;
+import collabFiltering.recSystems.CFRecSystem;
+import collabFiltering.recSystems.RecSystem;
+import collabFiltering.recommenders.RecRarity;
+import collabFiltering.recommenders.Recommend;
+
 
 public class MainTesting {
 	
@@ -46,14 +55,14 @@ public class MainTesting {
 		
 		/**  build recommender	 */
 		
-		RecSystem system = new CFRecSystem(answersTable, neighbourhood, recommender, numNeighbours, numNeighbours);
+		RecSystem system = new CFRecSystem(answersTable, neighbourhood, recommender, numNeighbours);
 		
 		int pmxid = hillary;
 		//for (int pmxid : answersTable.userList){
 			
 			/**  make recommendations	 */
 		
-			system.makeRecommendations(pmxid);
+			system.makeRecommendations(pmxid, numRecs);
 			
 			/** Print recommendations */
 			

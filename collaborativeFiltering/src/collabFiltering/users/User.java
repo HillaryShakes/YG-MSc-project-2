@@ -1,4 +1,4 @@
-package collabFiltering;
+package collabFiltering.users;
 
 import java.util.Hashtable;
 
