@@ -15,11 +15,11 @@ import java.util.Set;
 
 public class NNRarity implements NearestNeighbours{
 	
-	private Answers answersTable;
+	private TableUsers answersTable;
 	private Things thingsTable;
 
 
-	public NNRarity(Answers answersTable, Things thingsTable){
+	public NNRarity(TableUsers answersTable, Things thingsTable){
 		this.answersTable = answersTable;
 		this.thingsTable = thingsTable;
 	}

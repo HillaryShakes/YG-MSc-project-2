@@ -17,11 +17,11 @@ import java.util.Map.Entry;
 
 public class RecRarity implements Recommend {
 	
-	private Answers answersTable;
+	private TableUsers answersTable;
 	private Things thingsTable;
 	private Set<String> recommendationIDs;
 	
-	public RecRarity(Answers answersTable, Things thingsTable){
+	public RecRarity(TableUsers answersTable, Things thingsTable){
 		this.answersTable = answersTable;
 		this.thingsTable = thingsTable;
 		

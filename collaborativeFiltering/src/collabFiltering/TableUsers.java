@@ -8,20 +8,21 @@ import java.sql.Statement;
 import java.util.Hashtable;
 
 
-public class Answers {
+public class TableUsers {
 	
 	private int pmxid;
 	private String tableName;
 	private Hashtable<Integer, User> answers = new Hashtable<Integer, User>();
 	private ResultSet users;
+	private Things things;
 	private Connection cxn = null;
 	public int[] userList;
 	
 	
-	public Answers(String tableName){
+	public TableUsers(String tableName, Things things){
 		
 		this.tableName = tableName;
-
+		this.things = things;
 		
     	try {
 			cxn = DriverManager.getConnection(
@@ -63,7 +64,11 @@ public class Answers {
 			int i = 0;
 			while (users.next()){
 				pmxid = users.getInt("users");
-				final User newUser = new User(pmxid, tableName);
+				/*
+				 * choose user type:
+				 */
+				final User newUser = new UserRatings(pmxid, tableName);
+				//final User newUser = new UserGenres(pmxid, tableName, things);
 				answers.put(pmxid, newUser);
 				newUser.closeCon();
 				userList[i] = pmxid;

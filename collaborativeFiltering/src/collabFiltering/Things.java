@@ -6,11 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Hashtable;
+import java.util.Set;
 
 
 public class Things {
 	
-	private Hashtable<String, Integer> thingstable = new Hashtable<String, Integer>();
+	private Hashtable<String, Integer> countTable = new Hashtable<String, Integer>();
+	private Hashtable<String, String> itemGenreTable = new Hashtable<String, String>();
+	private Hashtable<String, Set> genreItemSet = new Hashtable<String, Set>();
 	private ResultSet things;
 	private Connection cxn = null;
 	private String tableName;
@@ -19,7 +22,10 @@ public class Things {
 	public Things(String tableName){
 		
 		this.tableName = tableName;
-
+		
+		/**
+		 * Make countTable:
+		 */
 		
     	try {
 			cxn = DriverManager.getConnection(
@@ -52,7 +58,7 @@ public class Things {
     		while(things.next()){
     			String thing_uuid = things.getString("thing_uuid");
     			int count = things.getInt("count");
-    			thingstable.put(thing_uuid, count);
+    			countTable.put(thing_uuid, count);
     		}
 			
     	} catch (SQLException e) {
@@ -61,19 +67,33 @@ public class Things {
 		}	
 	}
 	
+	 
+	/*
+	 * TODO Make genre table
+	 */
+	
 
 
 
-
-
-	public Hashtable<String, Integer> getThingsTable(){
-		return thingstable;
+	public Hashtable<String, Integer> getCountTable(){
+		return countTable;
+	}
+	
+	public Hashtable<String, String> getItemGenreTable(){
+		return itemGenreTable;
+	}
+	
+	public Hashtable<String, Set> getGenreItemSet(){
+		return genreItemSet;
 	}
 	
 	public int getCount(String thing_uuid){
-		return thingstable.get(thing_uuid);
+		return countTable.get(thing_uuid);
 	}
 	
+	public String getGenre(String thing_uuid){
+		return itemGenreTable.get(thing_uuid);
+	}
 	
 	public void closeCon(){
 		try {
@@ -83,7 +103,7 @@ public class Things {
 			System.out.println("couldnt close things");
 			e.printStackTrace();
 		}
+		
 	}
-
 }
 

@@ -19,10 +19,10 @@ import java.util.Set;
 
 public class NNProportional implements NearestNeighbours{
 	
-	private Answers answersTable;
+	private TableUsers answersTable;
 
 
-	public NNProportional(Answers answersTable){
+	public NNProportional(TableUsers answersTable){
 		this.answersTable = answersTable;
 		
 	}

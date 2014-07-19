@@ -14,10 +14,10 @@ import java.util.Set;
 
 public class NNCount implements NearestNeighbours{
 	
-	private Answers answersTable;
+	private TableUsers answersTable;
 
 
-	public NNCount(Answers answersTable){
+	public NNCount(TableUsers answersTable){
 		this.answersTable = answersTable;
 		
 	}

@@ -18,12 +18,12 @@ import java.util.Map.Entry;
 
 public class RecCommonInterest implements Recommend{
 	
-	private Answers answersTable;
+	private TableUsers answersTable;
 	private Set<String> recommendationIDs;
 
 
 
-	public RecCommonInterest(Answers answersTable){
+	public RecCommonInterest(TableUsers answersTable){
 		this.answersTable = answersTable;
 		
 	}

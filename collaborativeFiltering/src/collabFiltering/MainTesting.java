@@ -20,36 +20,45 @@ public class MainTesting {
 		int numRecs = 10;
 		int numNeighbours = 20;
 		
+		
 		/**  Set up	 */
 		
-		Answers answersTable = new Answers(tableName);
+		Things things = new Things(tableName);
+		things.closeCon();
+		
+		TableUsers answersTable = new TableUsers(tableName, things);
 		answersTable.closeCon();
 		
-		Things thingsTable = new Things(tableName);
-		thingsTable.closeCon();
+		/**  choose nearest neighbours method */
 		
 		//NearestNeighbours neighbourhood = new NNProportional(answersTable);
-		NearestNeighbours neighbourhood = new NNRarity(answersTable, thingsTable);
-		Recommend recommender = new RecRarity(answersTable, thingsTable);
+		NearestNeighbours neighbourhood = new NNRarity(answersTable, things);
+		
+		/**  choose recommender */
+		
+		Recommend recommender = new RecRarity(answersTable, things);
 		//Recommend recommender = new RecCommonInterest(answersTable);
-		Printer print = new CSV2ColPrinter("printing.csv", numRecs);
-		//Printer print = new MiniPrinter();
+		
+		/**  choose printer	 */
+		
+		//Printer print = new CSV2ColPrinter("printing.csv", numRecs);
+		Printer print = new MiniPrinter();
+		
+		/**  build recommender	 */
+		
+		RecSystem system = new CFRecSystem(answersTable, neighbourhood, recommender, numNeighbours, numNeighbours);
 		
 		int pmxid = hillary;
 		//for (int pmxid : answersTable.userList){
 			
-			/**  Find the users nearest neighbours	 */
-			
-			List<Pair> neighbours = neighbourhood.getNeighbours(numNeighbours, pmxid);
-			
-			/** Get recommendations from neighbours ratings */
-
-			Set<String> recommendations = recommender.getRecommendations(numRecs, neighbours, pmxid);
+			/**  make recommendations	 */
+		
+			system.makeRecommendations(pmxid);
 			
 			/** Print recommendations */
 			
+			system.printRecommendations(print, pmxid);
 			
-			print.printRecs(pmxid, recommendations);
 			
 		//}
 			
