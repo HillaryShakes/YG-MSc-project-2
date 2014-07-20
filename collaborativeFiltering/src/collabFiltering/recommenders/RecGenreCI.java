@@ -19,14 +19,12 @@ public class RecGenreCI implements Recommend{
 	private Set<String> recommendationIDs;
 	private String genre;
 	private Things things;
-	private Set recommendations;
 
 
-	public RecGenreCI (TableUsers answersTable, String genre, Things things, Set recommendations){
+	public RecGenreCI (TableUsers answersTable, String genre, Things things){
 		this.answersTable = answersTable;
 		this.genre = genre;
 		this.things = things;
-		this.recommendations = recommendations;
 		
 	}
 

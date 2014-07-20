@@ -18,6 +18,10 @@ public class Things {
 	private Connection cxn = null;
 	private String tableName;
 	
+	/**
+	 * N.B. need to include genres in the 'table' you give as tablename
+	 */
+	
 	
 	public Things(String tableName){
 		
@@ -54,23 +58,32 @@ public class Things {
     	
     	try {
     		Statement stmt = cxn.createStatement();
-    		things = stmt.executeQuery("SELECT thing_uuid, COUNT(thing_uuid) FROM " + tableName +" GROUP BY thing_uuid");
+    		things = stmt.executeQuery("SELECT thing_uuid, genre, COUNT(thing_uuid) FROM " + tableName +" GROUP BY thing_uuid, genre");
     		while(things.next()){
     			String thing_uuid = things.getString("thing_uuid");
     			int count = things.getInt("count");
     			countTable.put(thing_uuid, count);
+    			/*
+    	    	 * TODO Make genre table
+    	    	 */
+    			String genre = things.getString("genre");
+    			itemGenreTable.put(thing_uuid, genre);
+    			
     		}
 			
     	} catch (SQLException e) {
     		System.out.println("things error");
 			e.printStackTrace();
 		}	
+    	
+    	
+    	/*
+    	 * TODO Make genreItemSet
+    	 */
 	}
 	
 	 
-	/*
-	 * TODO Make genre table
-	 */
+	
 	
 
 
@@ -94,6 +107,11 @@ public class Things {
 	public String getGenre(String thing_uuid){
 		return itemGenreTable.get(thing_uuid);
 	}
+	
+	public Set getItems(String genre){
+		return genreItemSet.get(genre);
+	}
+	
 	
 	public void closeCon(){
 		try {
