@@ -9,15 +9,16 @@ import collabFiltering.Pair;
 import collabFiltering.TableUsers;
 import collabFiltering.Things;
 import collabFiltering.users.User;
+import collabFiltering.users.UserGenres;
 
-public class NNGenre implements NearestNeighbours{
+public class NNGenreRarity implements NearestNeighbours{
 	
 	private TableUsers answersTable;
 	private Things thingsTable;
 	private String genre;
 
 
-	public NNGenre(TableUsers answersTable, Things thingsTable, String genre){
+	public NNGenreRarity(TableUsers answersTable, Things thingsTable, String genre){
 		this.answersTable = answersTable;
 		this.thingsTable = thingsTable;
 		this.genre = genre;
@@ -25,8 +26,10 @@ public class NNGenre implements NearestNeighbours{
 
 	@Override
 	public List<Pair> getNeighbours(int numNeighbours, int pmxid) {
-		User user = answersTable.getUser(pmxid);
+		//check ok
+		UserGenres user = (UserGenres) answersTable.getUser(pmxid);
 		Set<String> userKeys = user.getRatingsTable().keySet();
+		//make set only of ratings for this genre
 		Set<String> userGenreKeys = new HashSet<String>();
 		for (String key : userKeys){
 			if (thingsTable.getGenre(key) == genre){

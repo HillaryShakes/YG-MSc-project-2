@@ -8,7 +8,8 @@ import java.sql.Statement;
 import java.util.Hashtable;
 
 import collabFiltering.users.User;
-import collabFiltering.users.UserRatings;
+import collabFiltering.users.UserGenres;
+
 
 
 public class TableUsers {
@@ -70,8 +71,8 @@ public class TableUsers {
 				/*
 				 * choose user type:
 				 */
-				final User newUser = new UserRatings(pmxid, tableName);
-				//final User newUser = new UserGenres(pmxid, tableName, things);
+				//final User newUser = new UserRatings(pmxid, tableName);
+				final User newUser = new UserGenres(pmxid, tableName, things);
 				answers.put(pmxid, newUser);
 				newUser.closeCon();
 				userList[i] = pmxid;
