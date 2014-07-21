@@ -19,12 +19,14 @@ public class RecGenreCI implements Recommend{
 	private Set<String> recommendationIDs;
 	private String genre;
 	private Things things;
+	private Set<String> recommendations;
 
 
-	public RecGenreCI (TableUsers answersTable, String genre, Things things){
+	public RecGenreCI (TableUsers answersTable, String genre, Things things, Set<String> recommendations){
 		this.answersTable = answersTable;
 		this.genre = genre;
 		this.things = things;
+		this.recommendations = recommendations;
 		
 	}
 
@@ -37,10 +39,16 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		//their keys are a set of all the items they have rated
 		Set<String> userKeys = user.getRatingsTable().keySet();
 		
+		System.out.println("neighbours:");
+		for (Pair userx : neighbours){
+			System.out.println(userx.getpmx());
+		}
+		
 		//make set only of ratings for this genre
 				Set<String> userGenreKeys = new HashSet<String>();
-				for (String key : userKeys){
-					if (things.getGenre(key) == genre){
+				for (String key : userKeys){ 
+					if (things.getGenres(key).contains(genre)){
+						//System.out.println("item: " + key + " genre: " + genre);
 						userGenreKeys.add(key);
 					}
 				}
@@ -58,17 +66,19 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 			User neighbour = answersTable.getUser(pair.getpmx());
 			Set<String> newUserKeys = neighbour.getRatingsTable().keySet();
 			for (String key : newUserKeys){
-				if (userKeys.contains(key)){
-					//ignore if item has already been rated by the user
-				}else if(recommendList.keySet().contains(key)){
-					//if the item is already in the list, up it's count by one
-					//as another neighbour agrees on this item
-					int current = recommendList.get(key);
-					recommendList.put(key, current +1);
-				}else{
-					//if this is the first occurance of an item,
-					//add it to the list with a count of one.
-					recommendList.put(key, 1);
+				if (things.getGenres(key).contains(genre)){
+					if (userKeys.contains(key) || recommendations.contains(key)){
+						//ignore if item has already been rated by the user
+					}else if(recommendList.keySet().contains(key)){
+						//if the item is already in the list, up it's count by one
+						//as another neighbour agrees on this item
+						int current = recommendList.get(key);
+						recommendList.put(key, current +1);
+					}else{
+						//if this is the first occurance of an item,
+						//add it to the list with a count of one.
+						recommendList.put(key, 1);
+					}
 				}
 			}
 		}
@@ -120,14 +130,14 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 				 * and the lowest scoring item is removed, keeping the 
 				 * size of the list at N. 
 				 */
-			for (int i = 0; i < numRecs-1; i ++){
-				if (score > recommendations.get(i).getValue()){
-					recommendations.remove(numRecs-1);
-					recommendations.add(i, entry);
-					break;
+				for (int i = 0; i < numRecs; i ++){
+					if (score > recommendations.get(i).getValue()){
+						recommendations.remove(numRecs-1);
+						recommendations.add(i, entry);
+						break;
 					
+					}
 				}
-			}
 			}
 			
 		
@@ -137,6 +147,7 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		//now can drop the scores and output the top N items
 		for (Entry<String, Integer> entry : recommendations){
 			recommendationIDs.add(entry.getKey());
+			System.out.println(entry.getKey() + " , " + entry.getValue());
 		}
 		return recommendationIDs;
 	}

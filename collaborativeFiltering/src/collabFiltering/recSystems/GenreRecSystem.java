@@ -38,25 +38,33 @@ public class GenreRecSystem implements RecSystem{
 
 		 /* work out genres*/
 		//might want to surround with try catch because needs to be usergenres
+		//System.out.println("make recs...");
 		UserGenres user = (UserGenres) answersTable.getUser(pmxid);
 		Hashtable<String, Integer> genresTable = user.getGenresTable();
-		int numRatings = user.getRatingsTable().size();
 		for (String genre : genresTable.keySet()){
 			 /* work out proportion of num recs to each */
-			int  numGenRecs = Math.round(numRecs * (genresTable.get(genre)/numRatings));
+			if (genre != "total"){
+			//System.out.println(genre + " : " + genresTable.get(genre));
+			//System.out.println("total: " + genresTable.get("total"));
+			int  numGenRecs = (int) Math.round(numRecs * (((double) genresTable.get(genre))/genresTable.get("total")));
 			/**have NN that finds neighbours within genre.
 			 * want it to take answersTable and thingsTable and
 			 * then refine these to look only at sections of relevant genre
 			 * can go through users in usertable as before but
 			 */
+			System.out.println("numGenRecs: " + numGenRecs);
 			if (numGenRecs >= 1){
 			NNGenreRarity nn = new NNGenreRarity(answersTable, thingsTable, genre);
-			RecGenreCI rec = new RecGenreCI(answersTable, genre, thingsTable);
+			RecGenreCI rec = new RecGenreCI(answersTable, genre, thingsTable, recommendations);
+			System.out.println("genre: " + genre);
 			Set<String> genreRecs = rec.getRecommendations(numGenRecs, nn.getNeighbours(numNeighbours, pmxid), pmxid);
+			
 			for (String recommendation : genreRecs){
 				recommendations.add(recommendation);
+				//System.out.println(recommendation);
 			}
-			
+			}
+
 			}
 			
 			

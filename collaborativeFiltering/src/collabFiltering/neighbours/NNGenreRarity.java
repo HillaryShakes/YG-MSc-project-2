@@ -32,7 +32,7 @@ public class NNGenreRarity implements NearestNeighbours{
 		//make set only of ratings for this genre
 		Set<String> userGenreKeys = new HashSet<String>();
 		for (String key : userKeys){
-			if (thingsTable.getGenre(key) == genre){
+			if (thingsTable.getGenres(key).contains(genre)){
 				userGenreKeys.add(key);
 			}
 		}

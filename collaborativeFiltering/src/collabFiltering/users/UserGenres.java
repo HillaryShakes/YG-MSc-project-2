@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Hashtable;
+import java.util.Set;
 
 import collabFiltering.Things;
 
@@ -58,7 +59,11 @@ public class UserGenres implements User{
 			while (userRatings.next()){
 				rating = userRatings.getInt("rating");
 				thing_uuid = userRatings.getString("thing_uuid");
+				if (ratings.contains(thing_uuid)){
+					
+				}else{
 				ratings.put(thing_uuid, rating);
+				}
 			//userRatings.close();
 			}
 			
@@ -71,17 +76,27 @@ public class UserGenres implements User{
     	/**
     	 * populate table of genres and their scores
     	 */
+    	String tot = "total";
+    	genres.put(tot, 0);
     	
     	for (String ratedItem : ratings.keySet()){
     		//do any have mutiple genres?? Then you'd have to deal with that
-    		String genre = things.getGenre(ratedItem);
+    		Set<String> itemGenres = things.getGenres(ratedItem);
+    		
+    		
+    		for ( String genre : itemGenres){
     		if (genres.containsKey(genre)){
     			int current = genres.get(genre);
     			//raise count for that object by 1
     			genres.put(genre, current + 1);
+    			int total = genres.get(tot);
+    			genres.put(tot, total + 1);
     		}
     		else{
     			genres.put(genre, 1);
+    			int total = genres.get(tot);
+    			genres.put(tot, total + 1);
+    		}
     		}
     	}
     	
