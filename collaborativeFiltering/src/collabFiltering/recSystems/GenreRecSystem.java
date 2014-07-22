@@ -52,11 +52,11 @@ public class GenreRecSystem implements RecSystem{
 			 * then refine these to look only at sections of relevant genre
 			 * can go through users in usertable as before but
 			 */
-			System.out.println("numGenRecs: " + numGenRecs);
+			//System.out.println("numGenRecs: " + numGenRecs);
 			if (numGenRecs >= 1){
 			NNGenreRarity nn = new NNGenreRarity(answersTable, thingsTable, genre);
 			RecGenreCI rec = new RecGenreCI(answersTable, genre, thingsTable, recommendations);
-			System.out.println("genre: " + genre);
+			//System.out.println("genre: " + genre);
 			Set<String> genreRecs = rec.getRecommendations(numGenRecs, nn.getNeighbours(numNeighbours, pmxid), pmxid);
 			
 			for (String recommendation : genreRecs){

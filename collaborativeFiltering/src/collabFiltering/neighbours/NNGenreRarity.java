@@ -49,11 +49,13 @@ public class NNGenreRarity implements NearestNeighbours{
 			
 			User thisUser = answersTable.getUser(id);
 			k = 0.0;
+			int j = 0;
 			
 			for (String item : userGenreKeys){
 				if (thisUser.getRatingsTable().containsKey(item)){
 					//add score for item depending on how rare it is
-					double rarity = 100.0/thingsTable.getCount(item);
+					double rarity = 10.0/thingsTable.getCount(item);
+					//System.out.println("ratiry: " + rarity);
 					
 					/* the rarity is effectively multiplied by 100 as the 
 					 * numbers would just be so small. 
@@ -62,23 +64,27 @@ public class NNGenreRarity implements NearestNeighbours{
 					 * at all still deserves a decent score, i.e this factor, that
 					 * could be varied is just to decrease the weighting of the rarity */
 					 
-					k += (10 + rarity);	
+					k += (1 + rarity);	
+					j += 1;
 				}
 				
 			}
+			double l = ((double) k )*k/ thisUser.length();
+			//System.out.println("l: " + l);
+			double x = ((double) j) / thisUser.length();
 			
-			
+			if (x < 1){
 			for (int i = 0; i < numNeighbours; i ++){
-				if (k > neighbours.get(i).getValue()){
+				if (l > neighbours.get(i).getValue()){
 					//add user in the right place
-					Pair newEntry = new Pair(id, k);
+					Pair newEntry = new Pair(id, l);
 					neighbours.add(i, newEntry);
 					//remove last entry, keeping the right length.
 					neighbours.remove(numNeighbours);
 					break;
 				}
 			}
-			
+			}
 		
 			
 		}

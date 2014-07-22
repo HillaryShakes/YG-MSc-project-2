@@ -27,7 +27,7 @@ public class MainTesting {
 		int freddie = 9706552;
 		
 		String tableName = "yougov.movies_genres2_random_1000";
-		int numRecs = 30;
+		int numRecs = 20;
 		int numNeighbours = 10;
 		
 		
@@ -60,7 +60,7 @@ public class MainTesting {
 		
 		RecSystem system = new GenreRecSystem(answersTable, things);
 		//RecSystem system = new CFRecSystem(answersTable, neighbourhood, recommender, numNeighbours);
-		int pmxid = hillary;
+		int pmxid = freddie;
 		//for (int pmxid : answersTable.userList){
 			
 			/**  make recommendations	 */

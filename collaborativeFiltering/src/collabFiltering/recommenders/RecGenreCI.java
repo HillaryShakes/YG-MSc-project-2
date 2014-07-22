@@ -39,10 +39,10 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		//their keys are a set of all the items they have rated
 		Set<String> userKeys = user.getRatingsTable().keySet();
 		
-		System.out.println("neighbours:");
-		for (Pair userx : neighbours){
-			System.out.println(userx.getpmx());
-		}
+		//System.out.println("neighbours:");
+		//for (Pair userx : neighbours){
+			//System.out.println(userx.getpmx());
+		//}
 		
 		//make set only of ratings for this genre
 				Set<String> userGenreKeys = new HashSet<String>();
@@ -86,14 +86,46 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		/*
 		 * Now make a list of top N recommendations to actually return
 		 */
-		
-		List<Entry<String, Integer>> recommendations = new ArrayList<Entry<String, Integer>>(numRecs);
+		//The second stage makes a new table and copies in each value, adding
+				//it's rarity score. This probably isn't the best way though...
+				Hashtable<String, Double> recommendList2 = new Hashtable<String, Double>();
+				
+				for (Entry<String, Integer> entry : recommendList.entrySet()){
+					//the item
+					String thing_uuid = entry.getKey();
+					
+					//number on neighbours that rated the item
+					int value = entry.getValue();
+					
+					//number of users in total that rated the item
+					int count = things.getCount(thing_uuid);
+					
+					//number of neighbours
+					int numNeighbours = neighbours.size();
+					
+					//number of users in total
+					int numUsers = answersTable.getAnswersTable().size();
+					
+					//srendipity score
+					double serendipityScore = (((double)value)/numNeighbours) - 
+							(((double)count)/numUsers);
+					
+					//give item a final score that takes into account the value
+					//and gives a bonus for a high serendipity score (I have multiplied by
+					//number of neighbours just to make it a comparable size to the scores
+					//so it can add to this.
+					double score = ((double) value) + (serendipityScore*numNeighbours);
+					recommendList2.put(thing_uuid, score);
+					
+				}
+				
+				List<Entry<String, Double>> recommendations = new ArrayList<Entry<String, Double>>(numRecs);
 
         //have to keep track of the first N runs to initialise with
 		//the items in the right order
 		int run = 0;
-		for (Entry<String, Integer> entry : recommendList.entrySet()){
-			int score = entry.getValue();
+		for (Entry<String, Double> entry : recommendList2.entrySet()){
+			double score = entry.getValue();
 			/*
 			 * initialise with first N ordered entries
 			 */
@@ -145,9 +177,9 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		
 		recommendationIDs = new HashSet<String>(numRecs);
 		//now can drop the scores and output the top N items
-		for (Entry<String, Integer> entry : recommendations){
+		for (Entry<String, Double> entry : recommendations){
 			recommendationIDs.add(entry.getKey());
-			System.out.println(entry.getKey() + " , " + entry.getValue());
+			//System.out.println(entry.getKey() + " , " + entry.getValue());
 		}
 		return recommendationIDs;
 	}
