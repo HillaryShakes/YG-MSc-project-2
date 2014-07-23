@@ -46,6 +46,7 @@ public class GenreRecSystem implements RecSystem{
 			if (genre != "total"){
 			//System.out.println(genre + " : " + genresTable.get(genre));
 			//System.out.println("total: " + genresTable.get("total"));
+				
 			int  numGenRecs = (int) Math.round(numRecs * (((double) genresTable.get(genre))/genresTable.get("total")));
 			/**have NN that finds neighbours within genre.
 			 * want it to take answersTable and thingsTable and

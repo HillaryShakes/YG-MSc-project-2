@@ -15,7 +15,10 @@ public class Things {
 	private Hashtable<String, Integer> countTable = new Hashtable<String, Integer>();
 	private Hashtable<String, Set> itemGenreTable = new Hashtable<String, Set>();
 	private Hashtable<String, Set> genreItemSet = new Hashtable<String, Set>();
+	private Hashtable<String, Integer> genreCountTable = new Hashtable<String, Integer>();
 	private ResultSet things;
+	private ResultSet relations;
+	private ResultSet genreCounts;
 	private Connection cxn = null;
 	private String tableName;
 	
@@ -59,7 +62,7 @@ public class Things {
     	
     	try {
     		Statement stmt = cxn.createStatement();
-    		things = stmt.executeQuery("SELECT thing_uuid, genre_uuid, COUNT(thing_uuid) FROM " + tableName +" GROUP BY thing_uuid, genre_uuid");
+    		things = stmt.executeQuery("SELECT thing_uuid, COUNT(thing_uuid) FROM " + tableName +" GROUP BY thing_uuid");
     		while(things.next()){
     			String thing_uuid = things.getString("thing_uuid");
     			int count = things.getInt("count");
@@ -69,23 +72,47 @@ public class Things {
     			}else{
     			countTable.put(thing_uuid, count);
     			}
-    			/*
-    	    	 * TODO Make genre table
-    	    	 */
-    			String genre = things.getString("genre_uuid");
-    			if (itemGenreTable.keySet().contains(thing_uuid)){
-    				Set<String> itemGenres = itemGenreTable.get(thing_uuid);
-    				itemGenres.add(genre);
-    				itemGenreTable.put(thing_uuid, itemGenres);
-    			}
-    			else{
-    				Set<String> itemGenres = new HashSet<String>();
-    				itemGenres.add(genre);
-    				itemGenreTable.put(thing_uuid, itemGenres);
-    			}
-    			
-    			
     		}
+    		things.close();
+    		
+    		/*
+    		 * get counts for genres
+    		 */
+    		genreCounts = stmt.executeQuery("SELECT genre_uuid, COUNT(genre_uuid) FROM yougov.relationships GROUP BY genre_uuid");
+    		
+    			/*
+    	    	 * Make genre table
+    	    	 */
+    		relations = stmt.executeQuery("SELECT thing_uuid, genre_uuid FROM yougov.relationships"); 
+    		while(relations.next()){
+    			String thing_uuid = relations.getString("thing_uuid");
+    			String genre = relations.getString("genre_uuid");
+    			if(countTable.keySet().contains(thing_uuid)){
+    				if (itemGenreTable.keySet().contains(thing_uuid)){
+    					Set<String> itemGenres = itemGenreTable.get(thing_uuid);
+    					itemGenres.add(genre);
+    					itemGenreTable.put(thing_uuid, itemGenres);
+    				}
+    				else{
+    					Set<String> itemGenres = new HashSet<String>();
+    					itemGenres.add(genre);
+    					itemGenreTable.put(thing_uuid, itemGenres);
+    				}
+    			}
+    		}
+    	relations.close();
+    			
+    	for (String item : countTable.keySet()){
+    		if (itemGenreTable.containsKey(item)){
+    			
+    		}else{
+    			Set<String> itemGenres = new HashSet<String>();
+    			itemGenres.add("noGenre");
+    			itemGenreTable.put(item, itemGenres);
+    		}
+    		
+    	}
+    		
 			
     	} catch (SQLException e) {
     		System.out.println("things error");
@@ -131,7 +158,6 @@ public class Things {
 	
 	public void closeCon(){
 		try {
-			things.close();
 			cxn.close();
 		} catch (SQLException e) {
 			System.out.println("couldnt close things");
