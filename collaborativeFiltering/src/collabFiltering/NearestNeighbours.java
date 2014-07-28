@@ -1,8 +1,6 @@
-package collabFiltering.neighbours;
+package collabFiltering;
 
 import java.util.List;
-
-import collabFiltering.Pair;
 
 public interface NearestNeighbours {
 	

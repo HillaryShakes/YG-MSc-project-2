@@ -1,13 +1,14 @@
-package collabFiltering.recSystems;
+package collabFiltering.basicRecommendation;
 
 import java.util.List;
 import java.util.Set;
 
+import collabFiltering.NearestNeighbours;
 import collabFiltering.Pair;
+import collabFiltering.RecSystem;
+import collabFiltering.Recommend;
 import collabFiltering.TableUsers;
-import collabFiltering.neighbours.NearestNeighbours;
 import collabFiltering.printers.Printer;
-import collabFiltering.recommenders.Recommend;
 
 public class CFRecSystem implements RecSystem{
 	

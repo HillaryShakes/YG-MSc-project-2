@@ -1,4 +1,4 @@
-package collabFiltering.recSystems;
+package collabFiltering;
 
 import collabFiltering.printers.Printer;
 

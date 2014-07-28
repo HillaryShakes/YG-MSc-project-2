@@ -12,10 +12,16 @@ import java.util.Set;
 
 public class Things {
 	
+	/* number of ratings each item got */
 	private Hashtable<String, Integer> countTable = new Hashtable<String, Integer>();
+	/* the set of genres each item belongs to */
 	private Hashtable<String, Set> itemGenreTable = new Hashtable<String, Set>();
+	/* the set of items that belong to each genre */
 	private Hashtable<String, Set> genreItemSet = new Hashtable<String, Set>();
 	private Hashtable<String, Integer> genreCountTable = new Hashtable<String, Integer>();
+	/* all the genres with the types of relationship. Eg. 'movies' has type 'type', 
+	 * a specific director would have type 'directed by' etc */
+	private Hashtable<String, String> genreTypeTable = new Hashtable<String, String>();
 	private ResultSet things;
 	private ResultSet relations;
 	private ResultSet genreCounts;
@@ -27,37 +33,14 @@ public class Things {
 	 */
 	
 	
-	public Things(String tableName){
+	public Things(String tableName, Connection cxn){
 		
 		this.tableName = tableName;
+		this.cxn = cxn;
 		
 		/**
 		 * Make countTable:
 		 */
-		
-    	try {
-			cxn = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/postgres", "postgres",
-					"yougov");
-			//System.out.println("connection worked");
-			
-		} catch (SQLException e) {
-			System.out.println("Connection Failed! Check output console");
-			e.printStackTrace();
-		
-		}
-    	try {
-			 
-			Class.forName("org.postgresql.Driver");
-
-		} catch (ClassNotFoundException e) {
-
-			System.out.println("Where is your PostgreSQL JDBC Driver? "
-					+ "Include in your library path!");
-			e.printStackTrace();
-			return;
-		}
-    	
     	
     	
     	try {
@@ -76,18 +59,27 @@ public class Things {
     		things.close();
     		
     		/*
-    		 * get counts for genres
+    		 * make genre type table
     		 */
-    		genreCounts = stmt.executeQuery("SELECT genre_uuid, COUNT(genre_uuid) FROM yougov.relationships GROUP BY genre_uuid");
-    		
+    		ResultSet genreRelations = stmt.executeQuery("SELECT genre_uuid, relationship FROM yougov.relationships");
+    		while(genreRelations.next()){
+    			String genre = genreRelations.getString("genre_uuid");
+    			String relation = genreRelations.getString("relationship");
+    			genreTypeTable.put(genre, relation);
+    		}
+    		genreRelations.close();
     			/*
-    	    	 * Make genre table
+    	    	 * Make genre genreCountTable, genreItemSet, and itemGenreTable
     	    	 */
+    		//need to get counts of all scores of all genres and total//
     		relations = stmt.executeQuery("SELECT thing_uuid, genre_uuid FROM yougov.relationships"); 
+    		String total = "total";
+    		genreCountTable.put(total, 0);
     		while(relations.next()){
     			String thing_uuid = relations.getString("thing_uuid");
     			String genre = relations.getString("genre_uuid");
     			if(countTable.keySet().contains(thing_uuid)){
+    				/* put in itemGenreTable */
     				if (itemGenreTable.keySet().contains(thing_uuid)){
     					Set<String> itemGenres = itemGenreTable.get(thing_uuid);
     					itemGenres.add(genre);
@@ -98,7 +90,22 @@ public class Things {
     					itemGenres.add(genre);
     					itemGenreTable.put(thing_uuid, itemGenres);
     				}
+    				/* put in genreCountTable */
+    				if (genreCountTable.keySet().contains(genre)){
+    					int thingCount = countTable.get(thing_uuid);
+    					int countSoFar = genreCountTable.get(genre);
+    					genreCountTable.put(genre, countSoFar + thingCount);
+    					int tot = genreCountTable.get(total);
+    					genreCountTable.put(total, tot + thingCount);
+    				}else{
+    					int thingCount = countTable.get(thing_uuid);
+    					genreCountTable.put(genre, thingCount);
+    					int tot = genreCountTable.get(total);
+    					genreCountTable.put(total, tot + thingCount);
+    				}
     			}
+    			
+    			
     		}
     	relations.close();
     			
@@ -126,10 +133,6 @@ public class Things {
 	}
 	
 	 
-	
-	
-
-
 
 	public Hashtable<String, Integer> getCountTable(){
 		return countTable;
@@ -155,15 +158,13 @@ public class Things {
 		return genreItemSet.get(genre);
 	}
 	
-	
-	public void closeCon(){
-		try {
-			cxn.close();
-		} catch (SQLException e) {
-			System.out.println("couldnt close things");
-			e.printStackTrace();
-		}
-		
+	public int getGenreCount(String genre){
+		return genreCountTable.get(genre);
 	}
+	
+	public String getGenreType(String genre){
+		return genreTypeTable.get(genre);
+	}
+	
 }
 

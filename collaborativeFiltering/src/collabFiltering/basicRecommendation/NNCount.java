@@ -1,12 +1,13 @@
-package collabFiltering.neighbours;
+package collabFiltering.basicRecommendation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import collabFiltering.NearestNeighbours;
 import collabFiltering.Pair;
 import collabFiltering.TableUsers;
-import collabFiltering.users.User;
+import collabFiltering.User;
 
 /**
  * nearest neighbours by count

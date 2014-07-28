@@ -1,14 +1,16 @@
 package collabFiltering;
 
+import genreBasedRecommendation.UserGenres;
+import genreBasedRecommendation.UserGenresSQL;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Hashtable;
-
-import collabFiltering.users.User;
-import collabFiltering.users.UserGenres;
+import java.util.List;
+import java.util.Set;
 
 
 
@@ -20,68 +22,24 @@ public class TableUsers {
 	private ResultSet users;
 	private Things things;
 	private Connection cxn = null;
-	public int[] userList;
+	public List<Integer> userList;
 	
 	
-	public TableUsers(String tableName, Things things){
+	public TableUsers(String tableName, Things things, List<Integer> userList, Connection cxn){
 		
 		this.tableName = tableName;
 		this.things = things;
+		this.cxn = cxn;
+		this.userList = userList;
 		
-    	try {
-			cxn = DriverManager.getConnection(
-					"jdbc:postgresql://127.0.0.1:5432/postgres", "postgres",
-					"yougov");
-			//System.out.println("connection worked");
-			
-		} catch (SQLException e) {
-			System.out.println("Connection Failed! Check output console");
-			e.printStackTrace();
-		
-		}
-    	try {
-			 
-			Class.forName("org.postgresql.Driver");
-
-		} catch (ClassNotFoundException e) {
-
-			System.out.println("Where is your PostgreSQL JDBC Driver? "
-					+ "Include in your library path!");
-			e.printStackTrace();
-			return;
-		}
-    	
-    	
-    	
-    	try {
-    		//count users to make userList of right size
-			Statement stmt = cxn.createStatement();
-			ResultSet countUsers = stmt.executeQuery("SELECT COUNT(DISTINCT users) FROM " + tableName);
-			int numUsers = 0;
-			while (countUsers.next()){
-				numUsers = countUsers.getInt("count");
-			}
-			//list of users, can't remember why I needed that...
-			userList = new int[numUsers];
-			String query = "SELECT DISTINCT(users) FROM " + tableName;
-			users = stmt.executeQuery(query);
-			int i = 0;
-			while (users.next()){
-				pmxid = users.getInt("users");
-				/*
-				 * choose user type:
-				 */
-				//final User newUser = new UserRatings(pmxid, tableName);
-				final User newUser = new UserGenres(pmxid, tableName, things);
-				answers.put(pmxid, newUser);
-				newUser.closeCon();
-				userList[i] = pmxid;
-				i = i + 1;
-			}
-			
-    	} catch (SQLException e) {
-    		System.out.println("answers");
-			e.printStackTrace();
+    	for (int pmxid : userList){
+			/*
+			 * choose user type:
+			 */
+			//final User newUser = new UserRatings(pmxid, tableName);
+			final User newUser = new UserGenres(pmxid, tableName, things, cxn);
+			//final User newUser = new UserGenresSQL(pmxid, tableName, things, cxn);
+			answers.put(pmxid, newUser);
 		}	
 	}
 	
@@ -93,15 +51,5 @@ public class TableUsers {
 		return answers.get(pmxid);
 	}
 	
-	
-	public void closeCon(){
-		try {
-			users.close();
-			cxn.close();
-		} catch (SQLException e) {
-			System.out.println("couldnt close userRatings");
-			e.printStackTrace();
-		}
-	}
 
 }

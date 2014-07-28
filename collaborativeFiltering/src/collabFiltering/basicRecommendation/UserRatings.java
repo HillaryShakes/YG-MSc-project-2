@@ -1,4 +1,4 @@
-package collabFiltering.users;
+package collabFiltering.basicRecommendation;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,27 +8,23 @@ import java.sql.Statement;
 import java.util.Hashtable;
 import java.util.Set;
 
-import collabFiltering.Things;
+import collabFiltering.User;
 
-public class UserGenres implements User{
+
+public class UserRatings implements User{
+	
 	private int rating;
 	private String tableName;
-	private Things things;
 	private int pmxid;
 	private String thing_uuid;
 	private ResultSet userRatings;
 	private Connection cxn = null;
 	private Hashtable<String, Integer> ratings = new Hashtable<String, Integer>();
-	private Hashtable<String, Integer> genres = new Hashtable<String, Integer>();
 	
-	public UserGenres(int pmxid, String tableName, Things things)  {
+	public UserRatings(int pmxid, String tableName)  {
     	this.tableName = tableName;
     	this.pmxid = pmxid;
-    	this.things = things;
     	
-    	/**
-    	 * populate table of ratings
-    	 */
     	
     	try {
 			cxn = DriverManager.getConnection(
@@ -59,12 +55,7 @@ public class UserGenres implements User{
 			while (userRatings.next()){
 				rating = userRatings.getInt("rating");
 				thing_uuid = userRatings.getString("thing_uuid");
-				if (ratings.contains(thing_uuid)){
-					
-				}else{
 				ratings.put(thing_uuid, rating);
-				}
-			//userRatings.close();
 			}
 			
     	} catch (SQLException e) {
@@ -73,42 +64,11 @@ public class UserGenres implements User{
 			
 		}	
     	
-    	/**
-    	 * populate table of genres and their scores
-    	 */
-    	String tot = "total";
-    	genres.put(tot, 0);
-    	
-    	for (String ratedItem : ratings.keySet()){
-    		//do any have mutiple genres?? Then you'd have to deal with that
-    		Set<String> itemGenres = things.getGenres(ratedItem);
-    		
-    		
-    		for ( String genre : itemGenres){
-    		if (genres.containsKey(genre)){
-    			int current = genres.get(genre);
-    			//raise count for that object by 1
-    			genres.put(genre, current + 1);
-    			int total = genres.get(tot);
-    			genres.put(tot, total + 1);
-    		}
-    		else{
-    			genres.put(genre, 1);
-    			int total = genres.get(tot);
-    			genres.put(tot, total + 1);
-    		}
-    		}
-    	}
-    	
     	
     }
 	
 	public Hashtable<String, Integer> getRatingsTable(){
 		return ratings;
-	}
-	
-	public Hashtable<String, Integer> getGenresTable(){
-		return genres;
 	}
 	
 	public int getpmxid(){
@@ -117,10 +77,6 @@ public class UserGenres implements User{
 	
 	public Integer getRating(String thing_uuid){
 		return ratings.get(thing_uuid);
-	}
-	
-	public Integer getGenreRating(String genre){
-		return genres.get(genre);
 	}
 	
 	public int length(){
@@ -137,6 +93,25 @@ public class UserGenres implements User{
 		}
 		
 	}
+
+	@Override
+	public Hashtable<String, Double> getGenresTable() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Double getGenreRating(String genre) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<String> getItemsFromGenre(String genre) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
+
 
 }
