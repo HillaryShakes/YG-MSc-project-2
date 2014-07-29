@@ -33,8 +33,8 @@ public class MainTesting {
 		int stephan = 9734410;
 		int freddie = 9706552;
 		
-		String tableName = "yougov.movies_random_5000";
-		int numRecs = 100;
+		String tableName = "yougov.movies_random_1000";
+		int numRecs = 30;
 		int numNeighbours = 10;
 		String fileName = "file.csv";
 		
@@ -101,7 +101,7 @@ public class MainTesting {
 		Printer print = new MiniPrinter();
 		
 		
-		int pmxid = stephan;
+		int pmxid = hillary;
 		//for (int pmxid : userList){
 		
 			/**  build recommender	 */

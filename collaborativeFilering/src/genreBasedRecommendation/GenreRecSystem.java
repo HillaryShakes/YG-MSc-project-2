@@ -30,6 +30,9 @@ public class GenreRecSystem implements RecSystem{
 	private Things thingsTable;
 	private int numNeighbours = 10;
 	Random rand = new Random(); 
+	private int numRecs;
+	private Hashtable<String, List<Pair>> oldNeighbours;
+	private List<PairString> uselessGenres;
 
 	public GenreRecSystem( TableUsers answersTable, Things thingsTable){
 		this.answersTable = answersTable;
@@ -39,7 +42,7 @@ public class GenreRecSystem implements RecSystem{
 	
 	@Override
 	public void makeRecommendations(int pmxid, int numRecs) {
-		int totalGenRecs = 0;
+		this.numRecs = numRecs;
 		Hashtable<String, Double> extraRecs = new Hashtable<String, Double>();
 		 /** work out genres*/
 		//might want to surround with try catch because needs to be usergenres
@@ -52,14 +55,18 @@ public class GenreRecSystem implements RecSystem{
 		 * of one rec from each genre*/
 		List<PairString> potentialGenre = new ArrayList<PairString>(numRecs);
 		
-		/* initialise to be a random set of N genres in genresTable but give all
-		 * all a score of zero so they are easily overtaken.
+		/* initialise to be a random set of N genres in genresTable 
+		 * - or just mother genre but give all a score of zero so they 
+		 * are easily overtaken.
 		 */
-		for (int i = 0; i < numRecs; i++){
-			int k = rand.nextInt((genresTable.keySet().size()) -1);
-			List<String> genreList = new ArrayList<String>(genresTable.keySet());
-			String randomGenre = genreList.get(k);
-			PairString init = new PairString(randomGenre, 0.0);
+		for (int i = 0; i < 20; i++){
+			/* don't really think it should be a random one actually */
+			//int k = rand.nextInt((genresTable.keySet().size()) -1);
+			//List<String> genreList = new ArrayList<String>(genresTable.keySet());
+			//String randomGenre = genreList.get(k);
+			//PairString init = new PairString(randomGenre, 0.0);
+			String movies = "b9be3802-a904-11e1-9412-005056900141";
+			PairString init = new PairString(movies, 0.0);
 			potentialGenre.add(init) ;
 		}
 		
@@ -69,59 +76,47 @@ public class GenreRecSystem implements RecSystem{
 				/** TODO score genres according to rarity of genre */
 				//double l = genresTable.get(genre);
 				//double l = (genresTable.get(genre)/genresTable.get("total"));
-				double l = (genresTable.get(genre)/genresTable.get("total"))*(genresTable.get(genre)/genresTable.get("total")) 
-						/ thingsTable.getGenreCount(genre)/thingsTable.getGenreCount("total");
-				for (int i = 0; i < numRecs; i ++){
+				double l = (genresTable.get(genre)/genresTable.get("total")) + 
+						((((double)genresTable.get(genre))/genresTable.get("total")) 
+								* (((double)genresTable.get(genre))/genresTable.get("total"))
+								/(((double)thingsTable.getGenreCount(genre))/thingsTable.getGenreCount("total")));
+				
+				//double l =  ((genresTable.get(genre)/genresTable.get("total"))*(genresTable.get(genre)/genresTable.get("total")) 
+				/// thingsTable.getGenreCount(genre)/thingsTable.getGenreCount("total"));
+		
+				for (int i = 0; i < 20; i ++){
 					if (l > potentialGenre.get(i).getValue()){
 						PairString newEntry = new PairString(genre, l);
 						potentialGenre.add(i, newEntry);
-						potentialGenre.remove(numRecs);
+						potentialGenre.remove(20);
 						break;
 					}
 				}
 			}
 		}
-
-		double totalGenreScores = 0.0;
-		for (PairString genre : potentialGenre){
-			totalGenreScores += genre.getValue();
-		}
-		/* work out the proportions of each of their top N genres */
-		for (PairString genre : potentialGenre){
-			genre.setValue(genre.getValue()/totalGenreScores);
-		}
-		/* recommend proportionally to interest in genres */
-		for (PairString genre : potentialGenre){
-			/* work out number of recs to produce from this genre */
-			int numGenRecs = (int) Math.round( genre.getValue()*numRecs);
-			System.out.println("genre: " + genre.getItem() + " number :" + numGenRecs);
-			if (recommendations.size() + numGenRecs > numRecs){
-				numGenRecs = numRecs - recommendations.size();
+		/* keep track of the useless genres so you can take them out second time */
+		uselessGenres = new ArrayList<PairString>();
+		oldNeighbours = new Hashtable<String, List<Pair>>();
+		while(recommendations.size() < numRecs){
+			
+			System.out.println("numRecsLeft: " + (numRecs - recommendations.size()));
+			
+			if( ((double) numRecs - recommendations.size()) < (((double) potentialGenre.size())/2) ){
+				break;
 			}
-			if (recommendations.size() + numGenRecs < numRecs){
-			/* choose neighbours within this genre */
-			NNGenreRarity nn = new NNGenreRarity(answersTable, thingsTable, genre.getItem());
-			/* set up a recommender giving it the recommendations so far so as not to 
-			 * repeat items in multiple genres */
-			RecGenreCI rec = new RecGenreCI(answersTable, genre.getItem(), thingsTable, recommendations);
-			/* produce recommendations from unusual overlap within genre of neighbours */
-			List<Pair> neighbours = nn.getNeighbours(numNeighbours, pmxid);
-			for (Pair neighbour : neighbours){
-				//System.out.println(neighbour.getpmx() + " , " + neighbour.getValue());
-			}
-			Set<String> genreRecs = rec.getRecommendations(numGenRecs, neighbours, pmxid);
-			for (String recommendation : genreRecs){
-				recommendations.add(recommendation);
-				System.out.println(recommendation);
-			}
-			}
-			}
+			
+			/* calculate scores */
+			calculateScores(potentialGenre, uselessGenres, genresTable);
 		
+			/* recommend proportionally to interest in genres */
+			recommend(potentialGenre, pmxid);
+			
+		}
 		
 		/* if for some reason it was unable to come up with the correct
 		 * number of recommendations, fill out the rest from just nearest 
 		 * neighbours within movies. */
-		while (recommendations.size() < numRecs){
+		if (recommendations.size() < numRecs){
 		String motherGenre = "b9be3802-a904-11e1-9412-005056900141"; 
 		/* choose neighbours in movies overall and recommend as usual from this to fill
 		 * out what extra recs are needed */
@@ -134,11 +129,72 @@ public class GenreRecSystem implements RecSystem{
 			recommendations.add(recommendation);
 			System.out.println("extra: " + recommendation);
 		}
-		
+		}
 	}
-		
-	}
+	
+	private List<PairString> calculateScores(List<PairString> potentialGenre, List<PairString> uselessGenres, Hashtable<String, Double> genresTable){
+		for (PairString genre : uselessGenres){
+				potentialGenre.remove(genre);
+		}
+		for (PairString genre : potentialGenre){
+		double l =  ((genresTable.get(genre.getItem())/genresTable.get("total"))*(genresTable.get(genre.getItem())/genresTable.get("total")) 
+				/ thingsTable.getGenreCount(genre.getItem())/thingsTable.getGenreCount("total"));
+		genre.setValue(l);
+		}
+		double totalGenreScores = 0.0;
+		for (PairString genre : potentialGenre){
+			totalGenreScores += genre.getValue();
+		}
+		/* work out the proportions of each of their top N genres */
+		for (PairString genre : potentialGenre){
+			genre.setValue(genre.getValue()/totalGenreScores);
+			//System.out.println("genre score: " + genre.getItem() + " , " + genre.getValue());
+		}
+		return potentialGenre;
+		}
 
+	private void recommend(List<PairString> potentialGenre, int pmxid){
+		int numRecsNeeded = numRecs - recommendations.size();
+				for (PairString genre : potentialGenre){
+					/* work out number of recs to produce from this genre */
+					int numGenRecs = (int) Math.round( genre.getValue()*numRecsNeeded);
+					System.out.println("genre: " + genre.getItem() + " number :" + numGenRecs);
+					
+					if (numGenRecs + recommendations.size() > numRecs){
+						numGenRecs = numRecs - recommendations.size();
+					}
+					
+					if (numGenRecs + recommendations.size() <= numRecs){
+					/* choose neighbours within this genre */
+					List<Pair> neighbours;
+						if (oldNeighbours.keySet().contains(genre.getItem())){
+							neighbours = oldNeighbours.get(genre.getItem());
+						}else{
+							NNGenreRarity nn = new NNGenreRarity(answersTable, thingsTable, genre.getItem());
+							neighbours = nn.getNeighbours(numNeighbours, pmxid);
+						}
+					/* set up a recommender giving it the recommendations so far so as not to 
+					 * repeat items in multiple genres */
+					RecGenreCI rec = new RecGenreCI(answersTable, genre.getItem(), thingsTable, recommendations);
+					/* produce recommendations from unusual overlap within genre of neighbours */
+					Set<String> genreRecs = rec.getRecommendations(numGenRecs, neighbours, pmxid);
+					for (String recommendation : genreRecs){
+						recommendations.add(recommendation);
+						System.out.println(recommendation);
+					}
+					
+					//System.out.println("numRecsProdced: " + genreRecs.size() + " numGenRecs: " + numGenRecs);
+					if (genreRecs.size() < numGenRecs){
+						uselessGenres.add(genre);	
+					}else{
+						oldNeighbours.put(genre.getItem(), neighbours);
+					}
+					//numRecsNeeded = numRecs - recommendations.size();
+					}
+					}
+	}
+	
+	
 	@Override
 	public void printRecommendations(Printer print, int pmxid) {
 		print.printRecs(pmxid, recommendations);

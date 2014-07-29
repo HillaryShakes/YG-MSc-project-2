@@ -28,9 +28,14 @@ public class RecGenreCI implements Recommend{
 		this.things = things;
 		this.recommendations = recommendations;
 		
+		
 	}
 
 public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pmxid) {
+	recommendationIDs = new HashSet<String>(numRecs);
+	if (numRecs == 0){
+		return recommendationIDs;
+	}
 		
 		/* this is the user we are trying to recommend for */
 	//may need try/catch or fix somehow
@@ -92,7 +97,7 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 			//number of users in total
 			int numUsers = answersTable.getAnswersTable().size();
 					
-			//srendipity score
+			//rarity score
 			/** TODO fiddle with this score */
 			double rarityScore = 1 + (((double)value)/numNeighbours)*(((double)value)/numNeighbours) 
 					/(((double)count)/numUsers);
@@ -159,7 +164,7 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		
 		}
 		
-		recommendationIDs = new HashSet<String>(numRecs);
+		
 		/* now can drop the scores and output the top N items */
 		for (Entry<String, Double> entry : recommendations){
 			recommendationIDs.add(entry.getKey());
