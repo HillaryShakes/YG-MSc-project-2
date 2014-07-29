@@ -71,7 +71,7 @@ public class NNGenreRarity implements NearestNeighbours{
 			/** TODO fiddle with weighting of proportional to shortness */
 			//double l = ((double) k )*k/ thisUser.length();
 			//this is too much helping short ones
-			double l = ((double) k )/ (thisUser.getItemsFromGenre(genre).size() + 10);
+			double l = ((double) k )/ (Math.max(thisUser.getItemsFromGenre(genre).size(), 20));
 			//double l = k;
 
 			/* check that user will add something, i.e. need x < 1 */

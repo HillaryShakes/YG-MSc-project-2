@@ -109,7 +109,14 @@ public class Things {
     		}
     	relations.close();
     			
-    	for (String item : countTable.keySet()){
+  	
+			
+    	} catch (SQLException e) {
+    		System.out.println("things error");
+			e.printStackTrace();
+		}	
+    	
+      	for (String item : countTable.keySet()){
     		if (itemGenreTable.containsKey(item)){
     			
     		}else{
@@ -119,14 +126,22 @@ public class Things {
     		}
     		
     	}
-    		
-			
-    	} catch (SQLException e) {
-    		System.out.println("things error");
-			e.printStackTrace();
-		}	
     	
-    	
+      	for (String item: countTable.keySet()){
+      		Set<String> itemGenres = itemGenreTable.get(item);
+      		for (String genre: itemGenres){
+      			if (genreItemSet.contains(genre)){
+      				Set<String> itemsSoFar = genreItemSet.get(genre);
+      				itemsSoFar.add(item);
+      				genreItemSet.put(genre, itemsSoFar);
+      			}else{
+      				Set<String> itemsSoFar = new HashSet<String>();
+      				itemsSoFar.add(item);
+      				genreItemSet.put(genre, itemsSoFar);
+      			}
+      			
+      		}
+      	}
     	/*
     	 * TODO Make genreItemSet
     	 */

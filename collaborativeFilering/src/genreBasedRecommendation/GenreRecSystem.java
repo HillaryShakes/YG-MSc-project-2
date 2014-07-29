@@ -33,6 +33,7 @@ public class GenreRecSystem implements RecSystem{
 	private int numRecs;
 	private Hashtable<String, List<Pair>> oldNeighbours;
 	private List<PairString> uselessGenres;
+	Hashtable<String, Double> genresTable;
 
 	public GenreRecSystem( TableUsers answersTable, Things thingsTable){
 		this.answersTable = answersTable;
@@ -49,7 +50,7 @@ public class GenreRecSystem implements RecSystem{
 		/* get user*/
 		UserGenres user = (UserGenres) answersTable.getUser(pmxid);
 		/* get their scores for all their genres*/
-		Hashtable<String, Double> genresTable = user.getGenresTable();
+		genresTable = user.getGenresTable();
 		/* this will be their top N scored genres for now take N as the number
 		 * of recs since this should be sufficient as there would be a minimum number
 		 * of one rec from each genre*/
@@ -76,14 +77,14 @@ public class GenreRecSystem implements RecSystem{
 				/** TODO score genres according to rarity of genre */
 				//double l = genresTable.get(genre);
 				//double l = (genresTable.get(genre)/genresTable.get("total"));
-				double l = (genresTable.get(genre)/genresTable.get("total")) + 
+				/*double l = (genresTable.get(genre)/genresTable.get("total")) + 
 						((((double)genresTable.get(genre))/genresTable.get("total")) 
 								* (((double)genresTable.get(genre))/genresTable.get("total"))
 								/(((double)thingsTable.getGenreCount(genre))/thingsTable.getGenreCount("total")));
-				
-				//double l =  ((genresTable.get(genre)/genresTable.get("total"))*(genresTable.get(genre)/genresTable.get("total")) 
-				/// thingsTable.getGenreCount(genre)/thingsTable.getGenreCount("total"));
-		
+				*/
+				double l = score(genre);
+				//System.out.println("genre: " +  genre);
+				//System.out.println("userProp: " + userProp + " rarityScore: " + rarityScore + " l: " + l);
 				for (int i = 0; i < 20; i ++){
 					if (l > potentialGenre.get(i).getValue()){
 						PairString newEntry = new PairString(genre, l);
@@ -99,14 +100,14 @@ public class GenreRecSystem implements RecSystem{
 		oldNeighbours = new Hashtable<String, List<Pair>>();
 		while(recommendations.size() < numRecs){
 			
-			System.out.println("numRecsLeft: " + (numRecs - recommendations.size()));
+			//System.out.println("numRecsLeft: " + (numRecs - recommendations.size()));
 			
 			if( ((double) numRecs - recommendations.size()) < (((double) potentialGenre.size())/2) ){
 				break;
 			}
 			
 			/* calculate scores */
-			calculateScores(potentialGenre, uselessGenres, genresTable);
+			calculateScores(potentialGenre, uselessGenres);
 		
 			/* recommend proportionally to interest in genres */
 			recommend(potentialGenre, pmxid);
@@ -127,18 +128,27 @@ public class GenreRecSystem implements RecSystem{
 		Set<String> genreRecs = rec.getRecommendations(numExtraRecs, neighbours, pmxid);
 		for (String recommendation : genreRecs){
 			recommendations.add(recommendation);
-			System.out.println("extra: " + recommendation);
+			//System.out.println("extra: " + recommendation);
 		}
 		}
 	}
 	
-	private List<PairString> calculateScores(List<PairString> potentialGenre, List<PairString> uselessGenres, Hashtable<String, Double> genresTable){
+	private double score(String genre){
+		double userProp = (((double) genresTable.get(genre))/genresTable.get("total"));
+		double totProp = ((double) thingsTable.getGenreCount(genre))/thingsTable.getGenreCount("total");
+		//double rarityScore = userProp * (userProp / totProp);
+		double rarityScore = Math.min(userProp * (userProp / totProp), userProp * 10);
+		double l = userProp + rarityScore;
+		//double l = rarityScore;
+		return l;
+	}
+	
+	private List<PairString> calculateScores(List<PairString> potentialGenre, List<PairString> uselessGenres){
 		for (PairString genre : uselessGenres){
 				potentialGenre.remove(genre);
 		}
 		for (PairString genre : potentialGenre){
-		double l =  ((genresTable.get(genre.getItem())/genresTable.get("total"))*(genresTable.get(genre.getItem())/genresTable.get("total")) 
-				/ thingsTable.getGenreCount(genre.getItem())/thingsTable.getGenreCount("total"));
+			double l = score(genre.getItem());
 		genre.setValue(l);
 		}
 		double totalGenreScores = 0.0;
@@ -158,7 +168,7 @@ public class GenreRecSystem implements RecSystem{
 				for (PairString genre : potentialGenre){
 					/* work out number of recs to produce from this genre */
 					int numGenRecs = (int) Math.round( genre.getValue()*numRecsNeeded);
-					System.out.println("genre: " + genre.getItem() + " number :" + numGenRecs);
+					//System.out.println("genre: " + genre.getItem() + " number :" + numGenRecs);
 					
 					if (numGenRecs + recommendations.size() > numRecs){
 						numGenRecs = numRecs - recommendations.size();
@@ -173,6 +183,11 @@ public class GenreRecSystem implements RecSystem{
 							NNGenreRarity nn = new NNGenreRarity(answersTable, thingsTable, genre.getItem());
 							neighbours = nn.getNeighbours(numNeighbours, pmxid);
 						}
+						System.out.println("genre: " + genre.getItem());
+						for (Pair neighbour : neighbours){
+							System.out.println(neighbour.getpmx());
+						}
+					
 					/* set up a recommender giving it the recommendations so far so as not to 
 					 * repeat items in multiple genres */
 					RecGenreCI rec = new RecGenreCI(answersTable, genre.getItem(), thingsTable, recommendations);
@@ -180,7 +195,7 @@ public class GenreRecSystem implements RecSystem{
 					Set<String> genreRecs = rec.getRecommendations(numGenRecs, neighbours, pmxid);
 					for (String recommendation : genreRecs){
 						recommendations.add(recommendation);
-						System.out.println(recommendation);
+						//System.out.println(recommendation);
 					}
 					
 					//System.out.println("numRecsProdced: " + genreRecs.size() + " numGenRecs: " + numGenRecs);
