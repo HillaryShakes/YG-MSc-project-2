@@ -56,9 +56,10 @@ public class NNGenreRarity implements NearestNeighbours{
 				if (thisUser.getItemsFromGenre(genre).contains(item)){
 					/* add score for item depending on how rare it is */
 					/** TODO fiddle with good rarity score */
-					double rarity = 10.0/thingsTable.getCount(item);
+					double rarity = 1.0/thingsTable.getCount(item);
+					System.out.println("rarity: " + rarity);
 					/* add up score for user */
-					k += (1 + rarity);
+					k += (1.0 + rarity*5);
 					/* keep track of how many items in common,
 					 * if neighbour won't add anything new, don't need them */
 					j += 1;
@@ -71,7 +72,8 @@ public class NNGenreRarity implements NearestNeighbours{
 			/** TODO fiddle with weighting of proportional to shortness */
 			//double l = ((double) k )*k/ thisUser.length();
 			//this is too much helping short ones
-			double l = ((double) k )/ (Math.max(thisUser.getItemsFromGenre(genre).size(), 20));
+			double l = ((double) k )/ (Math.max(thisUser.getItemsFromGenre(genre).size(), 80));
+					//((double) thingsTable.getGenreItemSet().get(genre).size())/100));
 			//double l = k;
 
 			/* check that user will add something, i.e. need x < 1 */

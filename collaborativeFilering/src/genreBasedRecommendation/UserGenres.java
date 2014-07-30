@@ -45,9 +45,10 @@ public class UserGenres implements User{
 				if (ratings.contains(thing_uuid)){
 					
 				}else{
-					if(rating >= 0){
+					//TODO use just positive ratings?
+					//if(rating >= 0){
 				ratings.put(thing_uuid, rating);
-					}
+					//}
 				}
 			//
 			}
