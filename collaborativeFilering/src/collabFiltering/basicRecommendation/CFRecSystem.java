@@ -38,4 +38,10 @@ public class CFRecSystem implements RecSystem{
 		
 	}
 
+	@Override
+	public Set<String> getRecommendations() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

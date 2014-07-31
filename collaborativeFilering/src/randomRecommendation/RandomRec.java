@@ -26,7 +26,7 @@ public class RandomRec implements RecSystem{
 		try {
 			Statement stmt = cxn.createStatement();
 			//System.out.println("recs for: " + pmxid);
-			String query = "SELECT thing_uuid "
+			String query = "SELECT DISTINCT(thing_uuid) "
 					+ "FROM " + tableName
 					+ " WHERE random() < 0.01 "
 					+ "EXCEPT" 
@@ -52,6 +52,11 @@ public class RandomRec implements RecSystem{
 	public void printRecommendations(Printer print, int pmxid) {
 		print.printRecs(pmxid, recommendations);
 		
+	}
+
+	@Override
+	public Set<String> getRecommendations() {
+		return recommendations;
 	}
 
 }

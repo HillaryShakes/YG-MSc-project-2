@@ -29,6 +29,9 @@ public class UserGenres implements User{
     	this.pmxid = pmxid;
     	this.things = things;
     	this.cxn = cxn;
+    	if (pmxid == 13484032){
+			System.out.println("making mummy");
+		}
     	
     	
     	/**
@@ -37,6 +40,7 @@ public class UserGenres implements User{
     	
     	try {
 			Statement stmt = cxn.createStatement();
+			
 			String query = "SELECT thing_uuid, rating FROM " + tableName +" WHERE users = " + pmxid;
 			userRatings = stmt.executeQuery(query);
 			while (userRatings.next()){
@@ -46,9 +50,9 @@ public class UserGenres implements User{
 					
 				}else{
 					//TODO use just positive ratings?
-					//if(rating >= 0){
+					if(rating >= 1){
 				ratings.put(thing_uuid, rating);
-					//}
+					}
 				}
 			//
 			}

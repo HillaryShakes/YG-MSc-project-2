@@ -56,10 +56,12 @@ public class NNGenreRarity implements NearestNeighbours{
 				if (thisUser.getItemsFromGenre(genre).contains(item)){
 					/* add score for item depending on how rare it is */
 					/** TODO fiddle with good rarity score */
-					double rarity = 1.0/thingsTable.getCount(item);
-					System.out.println("rarity: " + rarity);
+					double rarity = answersTable.getAnswersTable().size()/thingsTable.getCount(item);
+					//System.out.println("rarity: " + rarity);
 					/* add up score for user */
-					k += (1.0 + rarity*5);
+					//System.out.println(rarity);
+					k += Math.min(rarity, 100);
+					//k += 1;
 					/* keep track of how many items in common,
 					 * if neighbour won't add anything new, don't need them */
 					j += 1;
@@ -72,7 +74,8 @@ public class NNGenreRarity implements NearestNeighbours{
 			/** TODO fiddle with weighting of proportional to shortness */
 			//double l = ((double) k )*k/ thisUser.length();
 			//this is too much helping short ones
-			double l = ((double) k )/ (Math.max(thisUser.getItemsFromGenre(genre).size(), 80));
+			//double l = k;
+			double l = ((double) k )/ (Math.max(thisUser.getItemsFromGenre(genre).size(), 10));
 					//((double) thingsTable.getGenreItemSet().get(genre).size())/100));
 			//double l = k;
 
@@ -99,7 +102,7 @@ public class NNGenreRarity implements NearestNeighbours{
 		 * give any new ratings, you don't get stuck with the same things genreated
 		 * each time and ultimately too few ratings. */
 			
-			boolean neighbourNeeded = true; 
+			/*boolean neighbourNeeded = true; 
 			while(neighbourNeeded){
 			int i = rand.nextInt((answersTable.userList.size()) -1); 
 			Pair newEntry = new Pair(answersTable.userList.get(i), 0.0);
@@ -108,7 +111,7 @@ public class NNGenreRarity implements NearestNeighbours{
 				neighbours.remove(numNeighbours);
 				neighbourNeeded = false;
 			}
-			}
+			}*/
 			
 		
 		return neighbours;

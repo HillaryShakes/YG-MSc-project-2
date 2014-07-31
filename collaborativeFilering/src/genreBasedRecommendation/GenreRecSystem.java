@@ -28,16 +28,17 @@ public class GenreRecSystem implements RecSystem{
 	private TableUsers answersTable;
 	private Set<String> recommendations;
 	private Things thingsTable;
-	private int numNeighbours = 10;
+	private int numNeighbours;
 	Random rand = new Random(); 
 	private int numRecs;
 	private Hashtable<String, List<Pair>> oldNeighbours;
 	private List<PairString> uselessGenres;
 	Hashtable<String, Double> genresTable;
 
-	public GenreRecSystem( TableUsers answersTable, Things thingsTable){
+	public GenreRecSystem( TableUsers answersTable, Things thingsTable, int numNeighbours){
 		this.answersTable = answersTable;
 		this.thingsTable = thingsTable;
+		this.numNeighbours = numNeighbours;
 		recommendations = new HashSet<String>();
 	}
 	
@@ -74,14 +75,7 @@ public class GenreRecSystem implements RecSystem{
 		for (String genre : genresTable.keySet()){
 			 /* choose the top N rated genres from their genrelist */
 			if (genre != "total"){
-				/** TODO score genres according to rarity of genre */
-				//double l = genresTable.get(genre);
-				//double l = (genresTable.get(genre)/genresTable.get("total"));
-				/*double l = (genresTable.get(genre)/genresTable.get("total")) + 
-						((((double)genresTable.get(genre))/genresTable.get("total")) 
-								* (((double)genresTable.get(genre))/genresTable.get("total"))
-								/(((double)thingsTable.getGenreCount(genre))/thingsTable.getGenreCount("total")));
-				*/
+				
 				double l = score(genre);
 				//System.out.println("genre: " +  genre);
 				//System.out.println("userProp: " + userProp + " rarityScore: " + rarityScore + " l: " + l);
@@ -133,11 +127,18 @@ public class GenreRecSystem implements RecSystem{
 		}
 	}
 	
+	public Set<String> getRecommendations(){
+		return recommendations;
+	}
+	
+	
 	private double score(String genre){
+		/** TODO score genres according to rarity of genre */
 		double userProp = (((double) genresTable.get(genre))/genresTable.get("total"));
 		double totProp = ((double) thingsTable.getGenreCount(genre))/thingsTable.getGenreCount("total");
 		//double rarityScore = userProp * (userProp / totProp);
-		double rarityScore = Math.min(userProp * (userProp / totProp), userProp * 10);
+		//System.out.println("genre: " + genre + " prop: " + (userProp/totProp) + " original: " + userProp);
+		double rarityScore = Math.min(userProp * (userProp / totProp), userProp * 50);
 		double l = userProp + rarityScore;
 		//double l = rarityScore;
 		return l;
@@ -195,7 +196,7 @@ public class GenreRecSystem implements RecSystem{
 					Set<String> genreRecs = rec.getRecommendations(numGenRecs, neighbours, pmxid);
 					for (String recommendation : genreRecs){
 						recommendations.add(recommendation);
-						//System.out.println(recommendation);
+						System.out.println(recommendation);
 					}
 					
 					//System.out.println("numRecsProdced: " + genreRecs.size() + " numGenRecs: " + numGenRecs);

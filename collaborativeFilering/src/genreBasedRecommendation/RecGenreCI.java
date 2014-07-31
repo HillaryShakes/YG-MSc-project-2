@@ -99,15 +99,20 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 					
 			//rarity score
 			/** TODO fiddle with this score */
-			double rarityScore = 1 + (((double)value)/numNeighbours)*(((double)value)/numNeighbours) 
-					/(((double)count)/numUsers);
-					
+			double neighbourProp = ((double)value)/numNeighbours;
+			double totalProp = ((double)count)/numUsers;
+			double rarityScore = neighbourProp * (neighbourProp / totalProp);
+			//double rarityScore = (neighbourProp / totalProp);
+			//System.out.println("rarity: " + rarityScore + " count: " + count);	
 			/* give item a final score that takes into account the value
 			 * and gives a bonus for a high serendipity score (I have multiplied by
 			 * number of neighbours just to make it a comparable size to the scores
 			 * so it can add to this.*/
 			//double score = ((double) value) + (serendipityScore*numNeighbours);
-			double score = (rarityScore);
+			double score =  rarityScore;
+			//double score =  count;
+			//double score =  (double) neighbourProp + (rarityScore*100);
+			//double score = 1.0 + Math.min(rarityScore, 20.0)*0;
 			recommendList2.put(thing_uuid, score);
 					
 		}

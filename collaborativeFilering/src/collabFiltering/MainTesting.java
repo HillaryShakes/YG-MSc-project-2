@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import randomRecommendation.RandomRec;
 import collabFiltering.basicRecommendation.CFRecSystem;
 import collabFiltering.basicRecommendation.NNRarity;
 import collabFiltering.basicRecommendation.RecRarity;
@@ -32,10 +33,12 @@ public class MainTesting {
 		int hillary = 9467900;
 		int stephan = 9734410;
 		int freddie = 9706552;
+		int james = 9219525;
+		int rosamund = 13484032;
 		
-		String tableName = "yougov.movies_random_1000";
+		String tableName = "yougov.movies_random_5000";
 		int numRecs = 30;
-		int numNeighbours = 10;
+		int numNeighbours = 1;
 		String fileName = "file.csv";
 		
 		/** connect to database */
@@ -106,7 +109,7 @@ public class MainTesting {
 		
 			/**  build recommender	 */
 		
-			RecSystem system = new GenreRecSystem(answersTable, things);
+			RecSystem system = new GenreRecSystem(answersTable, things, numNeighbours);
 			//RecSystem system = new RandomRec(tableName, cxn);
 			//RecSystem system = new CFRecSystem(answersTable, neighbourhood, recommender, numNeighbours);
 			
@@ -114,6 +117,14 @@ public class MainTesting {
 			system.makeRecommendations(pmxid, numRecs);
 			/** Print recommendations */
 			
+			Set<String> recommendations = system.getRecommendations();
+			double score = 0;
+			
+			for (String item : recommendations){
+				score += ((double) things.getCount(item))/things.getCount("ba7998c8-a904-11e1-9412-005056900141");
+			}
+			
+			System.out.println(score*1.5);
 			system.printRecommendations(print, pmxid);
 			
 			
