@@ -1,8 +1,11 @@
 package collabFiltering;
 
+import genreBasedRecommendation.ThingsSerializable;
 import genreBasedRecommendation.UserGenres;
 import genreBasedRecommendation.UserGenresSQL;
+import genreBasedRecommendation.UserGenresSerializable;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,22 +17,20 @@ import java.util.Set;
 
 
 
-public class TableUsers {
+public class TableUsers implements Serializable{
 	
 	private int pmxid;
 	private String tableName;
-	private Hashtable<Integer, User> answers = new Hashtable<Integer, User>();
+	private Hashtable<Integer, UserGenresSerializable> answers = new Hashtable<Integer, UserGenresSerializable>();
 	private ResultSet users;
-	private Things things;
-	private Connection cxn = null;
+	private ThingsSerializable things;
 	public List<Integer> userList;
 	
 	
-	public TableUsers(String tableName, Things things, List<Integer> userList, Connection cxn){
+	public TableUsers(String tableName, ThingsSerializable things, List<Integer> userList){
 		
 		this.tableName = tableName;
 		this.things = things;
-		this.cxn = cxn;
 		this.userList = userList;
 		
     	for (int pmxid : userList){
@@ -37,17 +38,19 @@ public class TableUsers {
 			 * choose user type:
 			 */
 			//final User newUser = new UserRatings(pmxid, tableName);
-			final User newUser = new UserGenres(pmxid, tableName, things, cxn);
+			final UserGenres newUser = new UserGenres(pmxid, tableName, things);
+			UserGenresSerializable seriUser = 
+					new UserGenresSerializable(newUser.getpmxid(), newUser.getRatingsTable(), newUser.getGenresTable(), newUser.getGenreItems());
 			//final User newUser = new UserGenresSQL(pmxid, tableName, things, cxn);
-			answers.put(pmxid, newUser);
+			answers.put(pmxid, seriUser);
 		}	
 	}
 	
-	public Hashtable<Integer, User> getAnswersTable(){
+	public Hashtable<Integer, UserGenresSerializable> getAnswersTable(){
 		return answers;
 	}
 	
-	public User getUser(int pmxid){
+	public UserGenresSerializable getUser(int pmxid){
 		return answers.get(pmxid);
 	}
 	

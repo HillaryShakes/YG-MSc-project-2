@@ -15,7 +15,7 @@ import collabFiltering.User;
 public class UserGenres implements User{
 	private int rating;
 	private String tableName;
-	private Things things;
+	private ThingsSerializable things;
 	private int pmxid;
 	private String thing_uuid;
 	private ResultSet userRatings;
@@ -24,14 +24,28 @@ public class UserGenres implements User{
 	private Hashtable<String, Double> genres = new Hashtable<String, Double>();
 	private Hashtable<String, Set<String>> genreItems = new Hashtable<String, Set<String>>();
 	
-	public UserGenres(int pmxid, String tableName, Things things, Connection cxn)  {
+	public UserGenres(int pmxid, String tableName, ThingsSerializable things)  {
     	this.tableName = tableName;
     	this.pmxid = pmxid;
     	this.things = things;
-    	this.cxn = cxn;
-    	if (pmxid == 13484032){
-			System.out.println("making mummy");
+    	try {
+			cxn = DriverManager.getConnection(
+					"jdbc:postgresql://127.0.0.1:5432/postgres", "postgres",
+					"yougov");
+			
+	
+    	try {
+			 
+			Class.forName("org.postgresql.Driver");
+
+		} catch (ClassNotFoundException e) {
+
+			System.out.println("Where is your PostgreSQL JDBC Driver? "
+					+ "Include in your library path!");
+			e.printStackTrace();
+			return;
 		}
+
     	
     	
     	/**
@@ -50,7 +64,7 @@ public class UserGenres implements User{
 					
 				}else{
 					//TODO use just positive ratings?
-					if(rating >= 1){
+					if(rating >= -2){
 				ratings.put(thing_uuid, rating);
 					}
 				}
@@ -127,6 +141,10 @@ public class UserGenres implements User{
     			}
     		}
     	}
+    	cxn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     	//System.out.println(genreItems);
     	
     }
@@ -157,6 +175,10 @@ public class UserGenres implements User{
 	
 	public Set<String> getItemsFromGenre(String genre){
 		return genreItems.get(genre);
+	}
+	
+	public Hashtable<String, Set<String>> getGenreItems(){
+		return genreItems;
 	}
 	
 

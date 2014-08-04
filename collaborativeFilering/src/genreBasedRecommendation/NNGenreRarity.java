@@ -29,9 +29,10 @@ public class NNGenreRarity implements NearestNeighbours{
 	@Override
 	public List<Pair> getNeighbours(int numNeighbours, int pmxid) {
 		//check ok
-		UserGenres user = (UserGenres) answersTable.getUser(pmxid);
+		UserGenresSerializable user =  answersTable.getUser(pmxid);
 		/* make set of user ratings for this genre */
 		Set<String> userGenreKeys = user.getItemsFromGenre(genre);
+		
 		/* make list of N nearest neighbours */
 		List<Pair> neighbours = new ArrayList<Pair>();
 		/* initialise to be a random set of N neighbours in userlist but give all
@@ -47,7 +48,7 @@ public class NNGenreRarity implements NearestNeighbours{
 		double k;
 		for (int id : answersTable.userList){
 			
-			UserGenres thisUser = (UserGenres) answersTable.getUser(id);
+			UserGenresSerializable thisUser =  answersTable.getUser(id);
 			k = 0.0;
 			int j = 0;
 			

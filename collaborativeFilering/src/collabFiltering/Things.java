@@ -1,5 +1,6 @@
 package collabFiltering;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,7 +11,7 @@ import java.util.Hashtable;
 import java.util.Set;
 
 
-public class Things {
+public class Things implements Serializable{
 	
 	/* number of ratings each item got */
 	private Hashtable<String, Integer> countTable = new Hashtable<String, Integer>();
@@ -179,6 +180,12 @@ public class Things {
 	
 	public String getGenreType(String genre){
 		return genreTypeTable.get(genre);
+	}
+	public Hashtable<String, String> getGenreTypeTable(){
+		return genreTypeTable;
+	}
+	public Hashtable<String, Integer> getGenreCountTable(){
+		return genreCountTable;
 	}
 	
 }

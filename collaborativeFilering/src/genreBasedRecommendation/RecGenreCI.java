@@ -39,7 +39,7 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		
 		/* this is the user we are trying to recommend for */
 	//may need try/catch or fix somehow
-		UserGenres user = (UserGenres) answersTable.getUser(pmxid);
+		UserGenresSerializable user =  answersTable.getUser(pmxid);
 		
 		/* make set only of ratings for this genre */
 		Set<String> userGenreKeys = user.getItemsFromGenre(genre);
@@ -52,7 +52,7 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 		
 		/* Each neighbour is a pair of the neighbour id and their similarity score */
 		for (Pair pair : neighbours){
-			UserGenres neighbour = (UserGenres) answersTable.getUser(pair.getpmx());
+			UserGenresSerializable neighbour =  answersTable.getUser(pair.getpmx());
 			Set<String> newUserKeys = neighbour.getItemsFromGenre(genre);
 			if(newUserKeys != null){
 			for (String key : newUserKeys){
@@ -110,7 +110,7 @@ public Set<String> getRecommendations(int numRecs, List<Pair> neighbours, int pm
 			 * so it can add to this.*/
 			//double score = ((double) value) + (serendipityScore*numNeighbours);
 			double score =  rarityScore;
-			//double score =  count;
+		    //double score =  count;
 			//double score =  (double) neighbourProp + (rarityScore*100);
 			//double score = 1.0 + Math.min(rarityScore, 20.0)*0;
 			recommendList2.put(thing_uuid, score);

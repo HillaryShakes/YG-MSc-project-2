@@ -49,7 +49,7 @@ public class GenreRecSystem implements RecSystem{
 		 /** work out genres*/
 		//might want to surround with try catch because needs to be usergenres
 		/* get user*/
-		UserGenres user = (UserGenres) answersTable.getUser(pmxid);
+		UserGenresSerializable user =  answersTable.getUser(pmxid);
 		/* get their scores for all their genres*/
 		genresTable = user.getGenresTable();
 		/* this will be their top N scored genres for now take N as the number
@@ -71,11 +71,11 @@ public class GenreRecSystem implements RecSystem{
 			PairString init = new PairString(movies, 0.0);
 			potentialGenre.add(init) ;
 		}
-		
+		String total = "total";
 		for (String genre : genresTable.keySet()){
 			 /* choose the top N rated genres from their genrelist */
-			if (genre != "total"){
-				
+			if (genre.equals(total)){
+			}else{
 				double l = score(genre);
 				//System.out.println("genre: " +  genre);
 				//System.out.println("userProp: " + userProp + " rarityScore: " + rarityScore + " l: " + l);
@@ -92,11 +92,12 @@ public class GenreRecSystem implements RecSystem{
 		/* keep track of the useless genres so you can take them out second time */
 		uselessGenres = new ArrayList<PairString>();
 		oldNeighbours = new Hashtable<String, List<Pair>>();
+		int i = 0;
 		while(recommendations.size() < numRecs){
 			
 			//System.out.println("numRecsLeft: " + (numRecs - recommendations.size()));
 			
-			if( ((double) numRecs - recommendations.size()) < (((double) potentialGenre.size())/2) ){
+			if( ((double) numRecs - recommendations.size()) < (((double) potentialGenre.size())/2) || i > numRecs ){
 				break;
 			}
 			
@@ -105,25 +106,34 @@ public class GenreRecSystem implements RecSystem{
 		
 			/* recommend proportionally to interest in genres */
 			recommend(potentialGenre, pmxid);
+			i ++;
 			
 		}
 		
 		/* if for some reason it was unable to come up with the correct
 		 * number of recommendations, fill out the rest from just nearest 
 		 * neighbours within movies. */
-		if (recommendations.size() < numRecs){
+		int numN = numNeighbours;
+		int j = 0;
+		while (recommendations.size() < numRecs){
+			if (j > 100){
+				System.out.println("too many loops " + pmxid);
+				break;
+			}
 		String motherGenre = "b9be3802-a904-11e1-9412-005056900141"; 
 		/* choose neighbours in movies overall and recommend as usual from this to fill
 		 * out what extra recs are needed */
 		NNGenreRarity nn = new NNGenreRarity(answersTable, thingsTable, motherGenre);
 		RecGenreCI rec = new RecGenreCI(answersTable, motherGenre, thingsTable, recommendations);
-		List<Pair> neighbours = nn.getNeighbours(numNeighbours, pmxid);
+		List<Pair> neighbours = nn.getNeighbours(numN, pmxid);
 		int numExtraRecs = numRecs - recommendations.size();
 		Set<String> genreRecs = rec.getRecommendations(numExtraRecs, neighbours, pmxid);
 		for (String recommendation : genreRecs){
 			recommendations.add(recommendation);
 			//System.out.println("extra: " + recommendation);
 		}
+		numN += 1;
+		j ++;
 		}
 	}
 	
@@ -184,10 +194,10 @@ public class GenreRecSystem implements RecSystem{
 							NNGenreRarity nn = new NNGenreRarity(answersTable, thingsTable, genre.getItem());
 							neighbours = nn.getNeighbours(numNeighbours, pmxid);
 						}
-						System.out.println("genre: " + genre.getItem());
-						for (Pair neighbour : neighbours){
-							System.out.println(neighbour.getpmx());
-						}
+						//System.out.println("genre: " + genre.getItem());
+						//for (Pair neighbour : neighbours){
+						//	System.out.println(neighbour.getpmx());
+						//}
 					
 					/* set up a recommender giving it the recommendations so far so as not to 
 					 * repeat items in multiple genres */
@@ -196,7 +206,7 @@ public class GenreRecSystem implements RecSystem{
 					Set<String> genreRecs = rec.getRecommendations(numGenRecs, neighbours, pmxid);
 					for (String recommendation : genreRecs){
 						recommendations.add(recommendation);
-						System.out.println(recommendation);
+						//System.out.println(recommendation);
 					}
 					
 					//System.out.println("numRecsProdced: " + genreRecs.size() + " numGenRecs: " + numGenRecs);

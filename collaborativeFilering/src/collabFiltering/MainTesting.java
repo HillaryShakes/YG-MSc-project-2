@@ -1,6 +1,7 @@
 package collabFiltering;
 
 import genreBasedRecommendation.GenreRecSystem;
+import genreBasedRecommendation.ThingsSerializable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,6 +22,19 @@ import collabFiltering.printers.CSVRowsPrinter;
 import collabFiltering.printers.MiniPrinter;
 import collabFiltering.printers.Printer;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+
 
 public class MainTesting {
 	
@@ -36,15 +50,16 @@ public class MainTesting {
 		int james = 9219525;
 		int rosamund = 13484032;
 		
-		String tableName = "yougov.movies_random_5000";
-		int numRecs = 30;
+		String tableName = "yougov.movies_august";
+		int numRecs = 27;
 		int numNeighbours = 1;
-		String fileName = "file.csv";
+		String fileName = "group2.csv";
 		
 		/** connect to database */
 		
 		Connection cxn = null;
 		List<Integer> userList = new ArrayList<Integer>();
+		List<Integer> friendsList = new ArrayList<Integer>();
 		
 		try {
 			cxn = DriverManager.getConnection(
@@ -75,6 +90,29 @@ public class MainTesting {
 				int pmx = users.getInt("users");
 				userList.add(pmx);
 			}
+			users.close();
+			/** make list of users to make recs for */
+	    	
+		    
+			Statement stmt2 = cxn.createStatement();
+			String query2 = "SELECT DISTINCT(users)"
+					+ " FROM yougov.friends";
+			ResultSet friends = stmt2.executeQuery(query2);
+			while (friends.next()){
+				int pmx = friends.getInt("users");
+				friendsList.add(pmx);
+			}
+			friends.close();
+			
+			Statement stmt3 = cxn.createStatement();
+			String query3 = "SELECT DISTINCT(users)"
+					+ " FROM yougov.group1";
+			ResultSet group = stmt2.executeQuery(query3);
+			while (group.next()){
+				int pmx = group.getInt("users");
+				friendsList.add(pmx);
+			}
+			group.close();
 		
     	
 		
@@ -82,11 +120,34 @@ public class MainTesting {
 		/**  Set up	 */
 		
 		Things things = new Things(tableName, cxn);
-		System.out.println("Made things");
+		ThingsSerializable thingsSerializable = new ThingsSerializable(things.getCountTable(), things.getItemGenreTable(),
+				things.getGenreItemSet(), things.getGenreCountTable(), things.getGenreTypeTable());
 		
-		TableUsers answersTable = new TableUsers(tableName, things, userList, cxn);
+		TableUsers answersTable = new TableUsers(tableName, thingsSerializable, userList);
 		System.out.println("Made users");
 		
+			
+	      try {
+	    	  OutputStream file = new FileOutputStream("answersTable.ser");
+		      OutputStream buffer = new BufferedOutputStream(file);
+			ObjectOutput output = new ObjectOutputStream(buffer);
+			output.writeObject(answersTable);
+			output.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	      
+			  try {
+				  InputStream file = new FileInputStream("answersTable.ser");
+			      //InputStream buffer = new BufferedInputStream(file);
+			      ObjectInput input = new ObjectInputStream (file);
+			       
+				try {
+					TableUsers answersTable2 = (TableUsers)input.readObject();
+					input.close();
+			
+	      cxn.close();
 		/**  choose nearest neighbours method */
 		
 		//NearestNeighbours neighbourhood = new NNProportional(answersTable);
@@ -99,13 +160,13 @@ public class MainTesting {
 		
 		/**  choose printer	 */
 		
-		//Printer print = new CSV2ColPrinter(fileName, numRecs);
+		Printer print = new CSV2ColPrinter(fileName, numRecs);
 		//Printer print = new CSVRowsPrinter(fileName, numRecs);
-		Printer print = new MiniPrinter();
+		//Printer print = new MiniPrinter();
 		
 		
-		int pmxid = hillary;
-		//for (int pmxid : userList){
+		//int pmxid = hillary;
+		for (int pmxid : friendsList){
 		
 			/**  build recommender	 */
 		
@@ -118,24 +179,31 @@ public class MainTesting {
 			/** Print recommendations */
 			
 			Set<String> recommendations = system.getRecommendations();
-			double score = 0;
+			/*double score = 0;
 			
 			for (String item : recommendations){
 				score += ((double) things.getCount(item))/things.getCount("ba7998c8-a904-11e1-9412-005056900141");
 			}
 			
-			System.out.println(score*1.5);
+			System.out.println(score*1.5);*/
 			system.printRecommendations(print, pmxid);
 			
 			
-		//}
+		}
 			
 			print.closePrint();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			  } catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				cxn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 		
 	}
